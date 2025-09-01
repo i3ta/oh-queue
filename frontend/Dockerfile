@@ -1,7 +1,7 @@
 FROM oven/bun
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package.json bun.lockb ./
