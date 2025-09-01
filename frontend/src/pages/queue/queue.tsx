@@ -1,3 +1,3 @@
 export const Queue = () => {
-  return <div>HI</div>;
+  return <div>HELLO</div>;
 };
