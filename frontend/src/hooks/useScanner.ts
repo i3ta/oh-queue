@@ -6,7 +6,7 @@ export const useScanner = (
   scanSep: number = 500,
 ) => {
   const lastInputTime = useRef(0);
-  const gtidRegex = /^\d{9}$/;
+  const gtidRegex = /;\d{4}=(\d{9})=[\w=]*$/;
 
   const enabledRef = useRef(enabled);
   const scanRef = useRef(onScan);
@@ -33,8 +33,9 @@ export const useScanner = (
             buffer = e.key;
           }
         } else if (e.key === "Enter") {
-          if (gtidRegex.test(buffer)) {
-            scanRef.current(buffer);
+          const matches = buffer.match(gtidRegex);
+          if (matches && matches.length >= 2) {
+            scanRef.current(matches[1]);
           }
           buffer = "";
         }

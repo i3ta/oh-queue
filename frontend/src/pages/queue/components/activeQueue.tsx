@@ -26,6 +26,7 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
   const [tas, setTAs] = useState<User[]>([]);
   const [addTAOpen, setAddTAOpen] = useState(false);
   const [addStudentOpen, setAddStudentOpen] = useState(false);
+  const [taDequeueOpen, setTADequeueOpen] = useState(false);
   const [taToRemove, setTAToRemove] = useState<string | null>(null);
 
   const expectedTime =
@@ -106,8 +107,24 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
     setAddStudentOpen(false);
   };
 
+  const handleDequeue = async (gtid: string) => {
+    const type = await getUserType(gtid);
+    if (type === "ta") {
+      const name = await dequeueUser();
+      if (name) {
+        toast(`The next student is Anonymous ${name}.`);
+      } else {
+        toast(`The queue is empty.`);
+      }
+    } else {
+      toast("You do not have permission for this.");
+    }
+    await updateData();
+    setTADequeueOpen(false);
+  };
+
   const shouldUseScanner =
-    enabled && !addTAOpen && !addStudentOpen && !taToRemove;
+    enabled && !addTAOpen && !addStudentOpen && !taToRemove && !taDequeueOpen;
   useScanner(handleScannedCard, shouldUseScanner);
 
   useEffect(() => {
@@ -172,7 +189,7 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
               {ta.name}
             </Text>
           ))}
-          <div className="w-full flex justify-center">
+          <div className="w-full flex justify-center gap-2">
             <Button
               className={cn(
                 "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
@@ -181,6 +198,15 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
               onClick={() => setAddTAOpen(true)}
             >
               Clock In
+            </Button>
+            <Button
+              className={cn(
+                "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
+                "text-white font-mono",
+              )}
+              onClick={() => setTADequeueOpen(true)}
+            >
+              Dequeue
             </Button>
           </div>
         </Card>
@@ -215,6 +241,11 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
         open={addStudentOpen}
         setOpen={setAddStudentOpen}
         onSubmit={handleAddStudent}
+      />
+      <GtidPopup
+        open={taDequeueOpen}
+        setOpen={setTADequeueOpen}
+        onSubmit={handleDequeue}
       />
       <GtidPopup
         open={taToRemove !== null}

@@ -19,7 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 const CustomToast = ({ children, onClick }: ComponentProps<"div">) => (
-  <Card onClick={onClick}>
+  <Card className="z-[900] bg-neutral-800" onClick={onClick}>
     <Text size="h2">{children}</Text>
   </Card>
 );
