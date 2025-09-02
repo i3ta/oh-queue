@@ -1,5 +1,3 @@
-import { Card } from "@/components/card";
-import { Text } from "@/components/text";
 import { useEffect, useState } from "react";
 import { SettingsPopup } from "./components/settingsPopup";
 import {
@@ -9,66 +7,15 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import type { SettingOption } from "@/types/settingOption";
-import { useScanner } from "@/hooks/useScanner";
 import { healthcheck } from "@/lib/api/healthcheck";
-import {
-  dequeueUser,
-  enqueueUser,
-  getQueue,
-  getUserType,
-} from "@/lib/api/queue";
-import { toast } from "sonner";
+import { ActiveQueue } from "./components/activeQueue";
+import { InactiveQueue } from "./components/inactiveQueue";
 
 export const Queue = () => {
   const [network, setNetwork] = useState<"pending" | "good" | "bad">("pending");
-  const [queue, setQueue] = useState<string[]>([]);
-  const [queueLength, setQueueLength] = useState(0);
-  const [tas, setTAs] = useState<string[]>([]);
-  const [taLength, setTALength] = useState(2); // WARN: Default to 0
-
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ohOpen, setOhOpen] = useState(true);
   const [estimatedTime, setEstimatedTime] = useState(5);
-
-  const expectedTime =
-    taLength > 0 ? (queueLength / taLength) * estimatedTime : "infinity";
-
-  const updateData = async () => {
-    try {
-      const { length, data } = await getQueue();
-      setQueueLength(length);
-      setQueue(data.map((u) => u.name));
-    } catch (err: any) {
-      console.error("There was an error updating queue data:", err);
-    }
-  };
-
-  const handleScannedCard = async (gtid: string) => {
-    // don't do anything if not open
-    if (!ohOpen) return;
-
-    const type = await getUserType(gtid);
-    if (type === "student") {
-      const { type, name } = await enqueueUser(gtid);
-      if (type === "exists") {
-        toast(`You are already in the queue! Your name is Anonymous ${name}.`);
-      } else if (type === "new") {
-        toast(
-          `You have been added to the queue! Your name is Anonymous ${name}.`,
-        );
-      }
-    } else if (type === "ta") {
-      const name = await dequeueUser();
-      if (name) {
-        toast(`The next student is Anonymous ${name}.`);
-      } else {
-        toast(`The queue is empty.`);
-      }
-    }
-    await updateData();
-  };
-
-  useScanner(handleScannedCard, !settingsOpen);
 
   const settings: SettingOption[] = [
     {
@@ -92,7 +39,6 @@ export const Queue = () => {
       if (connection) setNetwork("good");
       else setNetwork("bad");
     });
-    updateData();
   }, []);
 
   return (
@@ -111,72 +57,9 @@ export const Queue = () => {
         />
       </div>
       {ohOpen ? (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 mb-20">
-            <div className="col-span-1 lg:col-span-2 flex flex-col justify-center">
-              <Text size="h2">Welcome to</Text>
-              <Text size="t2">
-                <span className="text-yellow-500">CS 2200</span> Office Hours
-              </Text>
-              <Text size="p">
-                Join the queue by scanning your Buzzcard at the front of the
-                room.
-              </Text>
-            </div>
-            <div className="col-span-1 flex flex-col gap-4">
-              <Card>
-                <Text>
-                  There are currently{" "}
-                  <span className="text-yellow-500 font-bold">2 TAs</span> on
-                  duty.
-                </Text>
-              </Card>
-              <Card>
-                <Text>
-                  There {queueLength === 1 ? "is" : "are"} currently{" "}
-                  <span className="text-yellow-500 font-bold">
-                    {queueLength} {queueLength === 1 ? "student" : "students"}
-                  </span>{" "}
-                  in the queue.
-                </Text>
-              </Card>
-              <Card>
-                <Text>
-                  The current expected wait time is about{" "}
-                  <span className="text-yellow-500 font-bold">
-                    {expectedTime} minutes
-                  </span>
-                  .
-                </Text>
-              </Card>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="h-fit flex flex-row">
-              <Text size="h3" className="font-bold">
-                TAs on duty
-              </Text>
-            </Card>
-            <Card className="h-fit flex flex-col gap-4">
-              <Text size="h3" className="font-bold">
-                Students in the queue
-              </Text>
-              {queue.map((user) => (
-                <Text size="p">Anonymous {user}</Text>
-              ))}
-            </Card>
-          </div>
-        </>
+        <ActiveQueue estimatedTime={estimatedTime} />
       ) : (
-        <div className="w-full h-full flex flex-col gap-8 justify-center items-center">
-          <img src="/caution.png" className="h-2/3 max-h-80" />
-          <Text size="t1">Sorry!</Text>
-          <Text size="h2" className="text-center">
-            CS 2200 Office Hours is{" "}
-            <span className="text-yellow-500">Closed</span>. Check the Google
-            Calendar for when Office Hours are open!
-          </Text>
-        </div>
+        <InactiveQueue />
       )}
       <SettingsPopup
         open={settingsOpen}

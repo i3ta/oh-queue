@@ -13,4 +13,12 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS tas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      gtid TEXT NOT NULL UNIQUE,
+      CHECK (gtid GLOB '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+  );
+`);
+
 export { db };

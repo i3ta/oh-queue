@@ -3,6 +3,7 @@ import cors from "cors";
 
 import healthRouter from "./api/health/health.routes";
 import queueRouter from "./api/queue/queue.routes";
+import tasRouter from "./api/tas/tas.routes";
 import gtidRouter from "./api/gtid/gtid.routes";
 
 const app = express();
@@ -18,6 +19,7 @@ app
 
 app.use("/api/health", healthRouter);
 app.use("/api/queue", queueRouter);
+app.use("/api/tas", tasRouter);
 app.use("/api/gtid", gtidRouter);
 
 export default app;
