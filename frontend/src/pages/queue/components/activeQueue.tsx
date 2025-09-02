@@ -1,4 +1,7 @@
+import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { GtidPopup } from "@/components/gtidPopup";
+import { toast } from "@/components/sonner";
 import { Text } from "@/components/text";
 import { useScanner } from "@/hooks/useScanner";
 import {
@@ -7,9 +10,10 @@ import {
   getQueue,
   getUserType,
 } from "@/lib/api/queue";
-import { getTAs } from "@/lib/api/tas";
+import { addTA, getTAs, removeTA } from "@/lib/api/tas";
+import { cn } from "@/lib/utils";
+import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 export interface ActiveQueueProps {
   estimatedTime: number;
@@ -19,7 +23,10 @@ export interface ActiveQueueProps {
 export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [queueLength, setQueueLength] = useState(0);
-  const [tas, setTAs] = useState<string[]>([]);
+  const [tas, setTAs] = useState<User[]>([]);
+  const [addTAOpen, setAddTAOpen] = useState(false);
+  const [addStudentOpen, setAddStudentOpen] = useState(false);
+  const [taToRemove, setTAToRemove] = useState<string | null>(null);
 
   const expectedTime =
     tas.length > 0 ? (queueLength / tas.length) * estimatedTime : "infinity";
@@ -37,17 +44,21 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
     }
   };
 
+  const enqueueStudent = async (gtid: string) => {
+    const { type, name } = await enqueueUser(gtid);
+    if (type === "exists") {
+      toast(`You are already in the queue! Your name is Anonymous ${name}.`);
+    } else if (type === "new") {
+      toast(
+        `You have been added to the queue! Your name is Anonymous ${name}.`,
+      );
+    }
+  };
+
   const handleScannedCard = async (gtid: string) => {
     const type = await getUserType(gtid);
     if (type === "student") {
-      const { type, name } = await enqueueUser(gtid);
-      if (type === "exists") {
-        toast(`You are already in the queue! Your name is Anonymous ${name}.`);
-      } else if (type === "new") {
-        toast(
-          `You have been added to the queue! Your name is Anonymous ${name}.`,
-        );
-      }
+      await enqueueStudent(gtid);
     } else if (type === "ta") {
       const name = await dequeueUser();
       if (name) {
@@ -59,9 +70,48 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
     await updateData();
   };
 
-  useScanner(handleScannedCard, enabled);
+  const handleAddTA = async (gtid: string) => {
+    const type = await getUserType(gtid);
+    if (type === "ta") {
+      await addTA(gtid);
+      toast("You have been clocked in!");
+    } else {
+      toast("You do not have permissions for this.");
+    }
+    await updateData();
+    setAddTAOpen(false);
+  };
+
+  const handleRemoveTA = async (gtid: string) => {
+    const type = await getUserType(gtid);
+    console.log(gtid, type, taToRemove);
+    if (type === "ta" && taToRemove) {
+      await removeTA(taToRemove);
+      toast("TA has been clocked out.");
+    } else {
+      toast("You do not have permissions for this.");
+    }
+    await updateData();
+    setTAToRemove(null);
+  };
+
+  const handleAddStudent = async (gtid: string) => {
+    const type = await getUserType(gtid);
+    if (type === "student") {
+      await enqueueStudent(gtid);
+    } else {
+      toast("You do not have permissions for this.");
+    }
+    await updateData();
+    setAddStudentOpen(false);
+  };
+
+  const shouldUseScanner =
+    enabled && !addTAOpen && !addStudentOpen && !taToRemove;
+  useScanner(handleScannedCard, shouldUseScanner);
 
   useEffect(() => {
+    // initialize data
     updateData();
   }, []);
 
@@ -108,20 +158,69 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="h-fit flex flex-row">
+        <Card className="h-fit flex flex-col gap-4">
           <Text size="h3" className="font-bold">
             TAs on duty
           </Text>
+          {tas.map((ta, i) => (
+            <Text
+              key={i}
+              size="p"
+              className="cursor-pointer hover:line-through"
+              onClick={() => setTAToRemove(ta.gtid)}
+            >
+              {ta.name}
+            </Text>
+          ))}
+          <div className="w-full flex justify-center">
+            <Button
+              className={cn(
+                "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
+                "text-white font-mono",
+              )}
+              onClick={() => setAddTAOpen(true)}
+            >
+              Clock In
+            </Button>
+          </div>
         </Card>
         <Card className="h-fit flex flex-col gap-4">
           <Text size="h3" className="font-bold">
             Students in the queue
           </Text>
-          {queue.map((user) => (
-            <Text size="p">Anonymous {user}</Text>
+          {queue.map((user, i) => (
+            <Text key={i} size="p">
+              Anonymous {user}
+            </Text>
           ))}
+          <div className="w-full flex justify-center">
+            <Button
+              className={cn(
+                "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
+                "text-white font-mono",
+              )}
+              onClick={() => setAddStudentOpen(true)}
+            >
+              Join Queue
+            </Button>
+          </div>
         </Card>
       </div>
+      <GtidPopup
+        open={addTAOpen}
+        setOpen={setAddTAOpen}
+        onSubmit={handleAddTA}
+      />
+      <GtidPopup
+        open={addStudentOpen}
+        setOpen={setAddStudentOpen}
+        onSubmit={handleAddStudent}
+      />
+      <GtidPopup
+        open={taToRemove !== null}
+        setOpen={(val) => !val && setTAToRemove(null)}
+        onSubmit={handleRemoveTA}
+      />
     </>
   );
 };

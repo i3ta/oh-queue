@@ -7,11 +7,17 @@ export const useScanner = (
 ) => {
   const lastInputTime = useRef(0);
   const gtidRegex = /^\d{9}$/;
+
   const enabledRef = useRef(enabled);
+  const scanRef = useRef(onScan);
 
   useEffect(() => {
     enabledRef.current = enabled;
   }, [enabled]);
+
+  useEffect(() => {
+    scanRef.current = onScan;
+  }, [onScan]);
 
   useEffect(() => {
     let buffer = "";
@@ -28,7 +34,7 @@ export const useScanner = (
           }
         } else if (e.key === "Enter") {
           if (gtidRegex.test(buffer)) {
-            onScan(buffer);
+            scanRef.current(buffer);
           }
           buffer = "";
         }

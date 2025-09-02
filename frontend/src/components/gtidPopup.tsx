@@ -26,6 +26,10 @@ export const GtidPopup = ({ open, setOpen, onSubmit }: GtidPopupProps) => {
     }
   }, [typedInput]);
 
+  useEffect(() => {
+    setTypedInput("");
+  }, [open]);
+
   return (
     open && (
       <PopupBackground onClose={handleClose}>
