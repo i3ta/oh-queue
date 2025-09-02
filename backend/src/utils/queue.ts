@@ -1,6 +1,5 @@
 import { db } from "@/config/db";
 import { QueueItem } from "@/types/queueItem";
-import { User } from "@/types/user";
 
 export const getQueueFromGTID = async (
   gtid: string,

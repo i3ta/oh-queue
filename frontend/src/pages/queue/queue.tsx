@@ -68,7 +68,7 @@ export const Queue = () => {
     await updateData();
   };
 
-  useScanner(handleScannedCard);
+  useScanner(handleScannedCard, !settingsOpen);
 
   const settings: SettingOption[] = [
     {
@@ -96,7 +96,7 @@ export const Queue = () => {
   }, []);
 
   return (
-    <div className="w-screen h-screen bg-neutral-900 py-8 px-20 flex flex-col gap-8">
+    <div className="w-screen h-full min-h-screen bg-neutral-900 py-8 px-20 flex flex-col gap-8">
       <div className="flex flex-row justify-end items-center gap-4">
         {network === "pending" ? (
           <CloudUpload className="text-neutral-600" />
