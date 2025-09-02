@@ -5,7 +5,7 @@ import { Toaster } from "./components/sonner";
 function App() {
   return (
     <BrowserRouter>
-      <Toaster />
+      <Toaster position="bottom-left" />
       <Routes>
         <Route path="/" element={<Queue />} />
       </Routes>

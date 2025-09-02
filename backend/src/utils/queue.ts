@@ -1,5 +1,6 @@
 import { db } from "@/config/db";
 import { QueueItem } from "@/types/queueItem";
+import { User } from "@/types/user";
 
 export const getQueueFromGTID = async (
   gtid: string,
@@ -34,6 +35,18 @@ export const getQueueLength = async (): Promise<number> => {
     return result.count;
   } catch (err) {
     console.error("Error getting queue length:", err);
+    throw err;
+  }
+};
+
+export const getQueue = async (length: number = 10): Promise<QueueItem[]> => {
+  const query = `SELECT * FROM queue LIMIT ${length}`;
+  try {
+    const stmt = db.prepare(query);
+    const result = stmt.all() as QueueItem[];
+    return result;
+  } catch (err: any) {
+    console.error("Error getting queue:", err);
     throw err;
   }
 };

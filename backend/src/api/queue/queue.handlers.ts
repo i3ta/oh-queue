@@ -2,6 +2,7 @@ import { isGTID } from "@/utils/gtid";
 import {
   dequeueUser,
   enqueueUser,
+  getQueue,
   getQueueFromGTID,
   getQueueLength,
 } from "@/utils/queue";
@@ -46,7 +47,8 @@ export const enqueueHandler = async (req: Request, res: Response) => {
 export const getQueueData = async (_req: Request, res: Response) => {
   try {
     const length = await getQueueLength();
-    res.status(200).json({ length: length });
+    const data = await getQueue();
+    res.status(200).json({ length: length, data: data });
     return;
   } catch (err: any) {
     console.error("There was an error getting queue data:", err);
