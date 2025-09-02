@@ -53,3 +53,5 @@ Below are the tasks that still need to be done to improve this project:
 - [ ] Add TA pictures for On-Duty TAs
 - [ ] Easier queue manipulation for TAs
 - [ ] Create production build
+- [ ] Backend route API documentation
+- [ ] Backend API tests for correctness and edge cases
