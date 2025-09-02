@@ -1,14 +1,12 @@
-import { Card } from "@/components/card";
+import { GtidPopup } from "@/components/gtidPopup";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
+import { PopupBackground } from "@/components/popupBackground";
 import { Switch } from "@/components/switch";
 import { Text } from "@/components/text";
-import { useScanner } from "@/hooks/useScanner";
 import { getUserType } from "@/lib/api/queue";
-import { cn } from "@/lib/utils";
 import type { SettingOption } from "@/types/settingOption";
-import { X } from "lucide-react";
-import { useState, type MouseEventHandler } from "react";
+import { useState, type MouseEvent } from "react";
 import { toast } from "sonner";
 
 export interface SettingsProps {
@@ -26,98 +24,68 @@ export const SettingsPopup = ({ open, setOpen, options }: SettingsProps) => {
       if (type === "ta") {
         setUnlocked(true);
       } else {
-        setOpen(false);
         toast("You do not have permission to edit the settings.");
+        handleClose();
       }
     } catch (err: any) {
-      setOpen(false);
+      handleClose();
     }
   };
 
-  useScanner(checkUnlock, open);
-
-  const handleClose: MouseEventHandler = (e) => {
-    e.stopPropagation();
+  const handleClose = (e?: MouseEvent<any>) => {
+    e?.stopPropagation();
     setOpen(false);
     setUnlocked(false);
   };
 
   return (
-    open && (
-      <div
-        className={cn(
-          "fixed z-100 w-screen h-screen left-0 top-0",
-          "bg-neutral-800/25 backdrop-blur-xs",
-          "flex justify-center items-center",
-        )}
-        onClick={handleClose}
-      >
-        <Card
-          className="relative w-11/12 max-w-3xl flex flex-col gap-4 p-8 bg-neutral-800"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {unlocked ? (
-            <>
-              <Text size="h1" className="mb-4">
-                Settings
-              </Text>
-              {options.map(({ type, id, value, setValue, label }) => (
-                <div className="flex flex-row gap-4" key={id}>
-                  {type === "boolean" ? (
-                    <>
-                      <Switch
-                        id={id}
-                        checked={value}
-                        onCheckedChange={setValue}
-                      />
-                      <Label htmlFor={id}>
-                        <Text>{label}</Text>
-                      </Label>
-                    </>
-                  ) : type === "string" ? (
-                    <>
-                      <Input
-                        type="text"
-                        className="w-50"
-                        id={id}
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                      />
-                      <Label htmlFor={id}>
-                        <Text>{label}</Text>
-                      </Label>
-                    </>
-                  ) : (
-                    <>
-                      <Input
-                        type="number"
-                        className="w-50"
-                        id={id}
-                        value={value}
-                        onChange={(e) => setValue(Number(e.target.value))}
-                      />
-                      <Label htmlFor={id}>
-                        <Text>{label}</Text>
-                      </Label>
-                    </>
-                  )}
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <Text>Scan your Buzzcard...</Text>
-            </>
-          )}
-          <X
-            className={cn(
-              "absolute top-8 right-8",
-              "text-white cursor-pointer hover:opacity-50 transition-all",
+    open &&
+    (unlocked ? (
+      <PopupBackground onClose={handleClose}>
+        <Text size="h1" className="mb-4">
+          Settings
+        </Text>
+        {options.map(({ type, id, value, setValue, label }) => (
+          <div className="flex flex-row gap-4" key={id}>
+            {type === "boolean" ? (
+              <>
+                <Switch id={id} checked={value} onCheckedChange={setValue} />
+                <Label htmlFor={id}>
+                  <Text>{label}</Text>
+                </Label>
+              </>
+            ) : type === "string" ? (
+              <>
+                <Input
+                  type="text"
+                  className="w-50"
+                  id={id}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+                <Label htmlFor={id}>
+                  <Text>{label}</Text>
+                </Label>
+              </>
+            ) : (
+              <>
+                <Input
+                  type="number"
+                  className="w-50"
+                  id={id}
+                  value={value}
+                  onChange={(e) => setValue(Number(e.target.value))}
+                />
+                <Label htmlFor={id}>
+                  <Text>{label}</Text>
+                </Label>
+              </>
             )}
-            onClick={handleClose}
-          />
-        </Card>
-      </div>
-    )
+          </div>
+        ))}
+      </PopupBackground>
+    ) : (
+      <GtidPopup open={open} setOpen={setOpen} onSubmit={checkUnlock} />
+    ))
   );
 };

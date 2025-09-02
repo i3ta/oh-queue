@@ -57,7 +57,7 @@ export const Queue = () => {
         />
       </div>
       {ohOpen ? (
-        <ActiveQueue estimatedTime={estimatedTime} />
+        <ActiveQueue estimatedTime={estimatedTime} enabled={!settingsOpen} />
       ) : (
         <InactiveQueue />
       )}

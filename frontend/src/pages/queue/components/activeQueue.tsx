@@ -13,9 +13,10 @@ import { toast } from "sonner";
 
 export interface ActiveQueueProps {
   estimatedTime: number;
+  enabled: boolean;
 }
 
-export const ActiveQueue = ({ estimatedTime }: ActiveQueueProps) => {
+export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [queueLength, setQueueLength] = useState(0);
   const [tas, setTAs] = useState<string[]>([]);
@@ -58,7 +59,7 @@ export const ActiveQueue = ({ estimatedTime }: ActiveQueueProps) => {
     await updateData();
   };
 
-  useScanner(handleScannedCard);
+  useScanner(handleScannedCard, enabled);
 
   useEffect(() => {
     updateData();
