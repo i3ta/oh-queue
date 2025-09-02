@@ -1,25 +1,11 @@
 services:
-  postgres:
-    image: postgres:latest
-    restart: always
-    environment: # Set basic username and password because it is never exposed
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: data
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./db/:/var/lib/postgresql/data
-
   backend:
     build: ./backend/
     ports:
       - 4000:4000
     volumes:
       - ./backend/:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - postgres
+      - backend_node_modules:/usr/src/app/node_modules
 
   frontend:
     build: ./frontend/
@@ -28,5 +14,6 @@ services:
       - /usr/src/app/node_modules
     ports:
       - 5173:5173
-    depends_on:
-      - backend
+
+volumes:
+  backend_node_modules:
