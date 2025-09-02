@@ -4,11 +4,16 @@ import { useState } from "react";
 import { SettingsPopup } from "./components/settingsPopup";
 import { SettingsIcon } from "lucide-react";
 import type { SettingOption } from "@/types/settingOption";
+import { useScanner } from "@/hooks/useScanner";
 
 export const Queue = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ohOpen, setOhOpen] = useState(true);
   const [estimatedTime, setEstimatedTime] = useState(5);
+
+  const handleScannedCard = async (gtid: string) => {};
+
+  useScanner(handleScannedCard);
 
   const settings: SettingOption[] = [
     {

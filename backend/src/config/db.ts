@@ -1,20 +1,16 @@
-import { Pool } from "pg";
+import Database from "better-sqlite3";
 import { config } from "./config";
 
-export const pool = new Pool({
-  user: config.dbUser,
-  password: config.dbPass,
-  host: config.dbHost,
-  port: config.dbPort,
-  database: config.dbName,
-});
+const db = new Database(config.dbPath);
 
-pool
-  .connect()
-  .then((client) => {
-    console.log("Connected to PostgreSQL");
-    client.release();
-  })
-  .catch((err) => {
-    console.error("Postgres connection error:", err);
-  });
+db.exec(`
+  CREATE TABLE IF NOT EXISTS queue (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      gtid TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      CHECK (gtid GLOB '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+  );
+`);
+
+export { db };
