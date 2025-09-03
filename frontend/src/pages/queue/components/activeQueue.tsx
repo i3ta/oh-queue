@@ -18,9 +18,14 @@ import { useEffect, useState } from "react";
 export interface ActiveQueueProps {
   estimatedTime: number;
   enabled: boolean;
+  endTime: string;
 }
 
-export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
+export const ActiveQueue = ({
+  estimatedTime,
+  enabled,
+  endTime,
+}: ActiveQueueProps) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [queueLength, setQueueLength] = useState(0);
   const [tas, setTAs] = useState<User[]>([]);
@@ -143,6 +148,11 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
           <Text size="p">
             Join the queue by scanning your Buzzcard at the front of the room.
           </Text>
+          {endTime !== "" && (
+            <Text size="p">
+              Office hours ends at <span className="font-bold">{endTime}</span>.
+            </Text>
+          )}
         </div>
         <div className="col-span-1 flex flex-col gap-4">
           <Card>
@@ -174,7 +184,8 @@ export const ActiveQueue = ({ estimatedTime, enabled }: ActiveQueueProps) => {
           </Card>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="col-span-1" />
         <Card className="h-fit flex flex-col gap-4">
           <Text size="h3" className="font-bold">
             TAs on duty

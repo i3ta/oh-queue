@@ -25,9 +25,16 @@ const CustomToast = ({ children, onClick }: ComponentProps<"div">) => (
 );
 
 export const toast = (message: string) => {
-  sonnerToast.custom((id) => (
-    <CustomToast onClick={() => sonnerToast.dismiss(id)}>{message}</CustomToast>
-  ));
+  sonnerToast.custom(
+    (id) => (
+      <CustomToast onClick={() => sonnerToast.dismiss(id)}>
+        {message}
+      </CustomToast>
+    ),
+    {
+      duration: 10000,
+    },
+  );
 };
 
 export { Toaster };

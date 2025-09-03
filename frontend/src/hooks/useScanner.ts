@@ -6,7 +6,7 @@ export const useScanner = (
   scanSep: number = 500,
 ) => {
   const lastInputTime = useRef(0);
-  const gtidRegex = /;\d{4}=(\d{9})=[\w=]*$/;
+  const gtidRegex = /;\d{4}=(\d{9})=.*$/;
 
   const enabledRef = useRef(enabled);
   const scanRef = useRef(onScan);

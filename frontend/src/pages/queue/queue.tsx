@@ -16,6 +16,7 @@ export const Queue = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ohOpen, setOhOpen] = useState(true);
   const [estimatedTime, setEstimatedTime] = useState(5);
+  const [ohEndTime, setOhEndTime] = useState<string>("");
 
   const settings: SettingOption[] = [
     {
@@ -31,6 +32,13 @@ export const Queue = () => {
       id: "estimatedTime",
       value: estimatedTime,
       setValue: setEstimatedTime,
+    },
+    {
+      type: "string",
+      label: "End Time",
+      id: "endTime",
+      value: ohEndTime,
+      setValue: setOhEndTime,
     },
   ];
 
@@ -57,7 +65,11 @@ export const Queue = () => {
         />
       </div>
       {ohOpen ? (
-        <ActiveQueue estimatedTime={estimatedTime} enabled={!settingsOpen} />
+        <ActiveQueue
+          estimatedTime={estimatedTime}
+          enabled={!settingsOpen}
+          endTime={ohEndTime}
+        />
       ) : (
         <InactiveQueue />
       )}

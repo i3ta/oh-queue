@@ -16,10 +16,10 @@ export const Text = ({
     t1: "text-[64px] font-bold",
     t2: "text-[48px] font-bold",
     h1: "text-[32px] font-bold",
-    h2: "text-[24px] font-bold",
-    h3: "text-[20px] font-medium",
-    p: "text-[16px] font-normal",
-    c: "text-[12px] font-normal",
+    h2: "text-[28px] font-bold",
+    h3: "text-[24px] font-medium",
+    p: "text-[20px] font-normal",
+    c: "text-[16px] font-normal",
   };
 
   return (
