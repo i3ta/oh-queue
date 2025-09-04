@@ -12,7 +12,20 @@ queue systems, most of the setup and descriptions of how the queue works will be
 
 ## Installation
 
-Below are the basic steps to install this queue on a system of your choosing:
+To deploy this queue on a device running a Unix-based OS, follow these instructions:
+
+1. Install Node.js and [`npm`](https://www.npmjs.com/). The Node.js version should be 22 or higher.
+2. Clone this repository onto the device.
+3. From the root of the repository, run:
+   ```sh
+   ./deploy.sh
+   ```
+
+> If you are running a Windows device, then you will have to run the development setup ;)
+
+### Development
+
+Below are the basic steps to install this repository for development:
 
 1. Install [Docker](https://www.docker.com/) and [Bun](https://bun.com/) ([npm](https://www.npmjs.com/) also works, but
    Bun is considerably faster for installation).
@@ -26,9 +39,6 @@ Below are the basic steps to install this queue on a system of your choosing:
    ```sh
    docker compose up
    ```
-
-> Running `docker compose up` starts both the frontend and backend in developer mode. A good production mode has not
-> been set up just yet.
 
 ## Repository structure
 
@@ -52,6 +62,5 @@ Below are the tasks that still need to be done to improve this project:
 - [ ] Remote dequeuing for TAs
 - [ ] Add TA pictures for On-Duty TAs
 - [ ] Easier queue manipulation for TAs
-- [ ] Create production build
 - [ ] Backend route API documentation
 - [ ] Backend API tests for correctness and edge cases
