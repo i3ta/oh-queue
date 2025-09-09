@@ -146,11 +146,12 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 mb-20 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="col-span-1 flex flex-col justify-center">
           <Text size="h2">Welcome to</Text>
           <Text size="t2">
-            <span className="text-yellow-500">CS 2200</span> Office Hours
+            <span className="text-yellow-500">CS 2200</span> <br />
+            Office Hours
           </Text>
           <Text size="p">
             Join the queue by scanning your Buzzcard at the front of the room.
@@ -216,7 +217,7 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
             </div>
           </Card>
         </div>
-        <Card className="h-fit flex flex-col gap-4">
+        <Card className="h-[85vh] flex flex-col flex-wrap gap-4">
           <Text size="h3" className="font-bold">
             Students in the queue
           </Text>
