@@ -49,7 +49,7 @@ export const getQueueLength = async (): Promise<number> => {
   }
 };
 
-export const getQueue = async (length: number = 10): Promise<QueueItem[]> => {
+export const getQueue = async (length: number = 26): Promise<QueueItem[]> => {
   const query = `SELECT * FROM queue LIMIT ${length}`;
   try {
     const stmt = db.prepare(query);

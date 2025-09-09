@@ -217,15 +217,17 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
             </div>
           </Card>
         </div>
-        <Card className="h-[85vh] flex flex-col flex-wrap gap-4">
+        <Card className="relative h-[85vh] flex flex-col gap-4">
           <Text size="h3" className="font-bold">
-            Students in the queue
+            Students in the queue ({queue.length} students)
           </Text>
-          {queue.map((user, i) => (
-            <Text key={i} size="p">
-              {user.length <= 12 ? user : `${user.slice(0, 11)}...`}
-            </Text>
-          ))}
+          <div className="h-[62vh] flex flex-col gap-2 flex-wrap">
+            {queue.map((user, i) => (
+              <Text key={i} size="p" className="w-40">
+                {user.length <= 10 ? user : `${user.slice(0, 10)}...`}
+              </Text>
+            ))}
+          </div>
           <div className="w-full flex justify-center">
             <Button
               className={cn(
