@@ -17,16 +17,11 @@ import { useEffect, useState } from "react";
 import { NamePopup } from "./namePopup";
 
 export interface ActiveQueueProps {
-  estimatedTime: number;
   enabled: boolean;
   endTime: string;
 }
 
-export const ActiveQueue = ({
-  estimatedTime,
-  enabled,
-  endTime,
-}: ActiveQueueProps) => {
+export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [queueLength, setQueueLength] = useState(0);
   const [tas, setTAs] = useState<User[]>([]);
@@ -37,9 +32,6 @@ export const ActiveQueue = ({
   const [taToRemove, setTAToRemove] = useState<string | null>(null);
   const [currentName, setCurrentName] = useState<string | null>(null);
   const [currentGtid, setCurrentGtid] = useState<string | null>(null);
-
-  const expectedTime =
-    tas.length > 0 ? (queueLength / tas.length) * estimatedTime : "infinity";
 
   const updateData = async () => {
     try {
@@ -83,7 +75,7 @@ export const ActiveQueue = ({
     } else if (type === "ta") {
       const name = await dequeueUser();
       if (name) {
-        toast(`The next student is Anonymous ${name}.`);
+        toast(`The next student is ${name}.`);
       } else {
         toast(`The queue is empty.`);
       }
@@ -154,8 +146,8 @@ export const ActiveQueue = ({
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 mb-20">
-        <div className="col-span-1 lg:col-span-2 flex flex-col justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-3 mb-20 gap-4">
+        <div className="col-span-1 flex flex-col justify-center">
           <Text size="h2">Welcome to</Text>
           <Text size="t2">
             <span className="text-yellow-500">CS 2200</span> Office Hours
@@ -188,54 +180,42 @@ export const ActiveQueue = ({
               in the queue.
             </Text>
           </Card>
-          <Card>
-            <Text>
-              The current expected wait time is about{" "}
-              <span className="text-yellow-500 font-bold">
-                {expectedTime} minutes
-              </span>
-              .
+          <Card className="h-fit flex flex-col gap-4">
+            <Text size="h3" className="font-bold">
+              TAs on duty
             </Text>
+            {tas.map((ta, i) => (
+              <Text
+                key={i}
+                size="p"
+                className="cursor-pointer hover:line-through"
+                onClick={() => setTAToRemove(ta.gtid)}
+              >
+                {ta.name}
+              </Text>
+            ))}
+            <div className="w-full flex justify-center gap-2">
+              <Button
+                className={cn(
+                  "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
+                  "text-white font-mono",
+                )}
+                onClick={() => setAddTAOpen(true)}
+              >
+                Clock In
+              </Button>
+              <Button
+                className={cn(
+                  "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
+                  "text-white font-mono",
+                )}
+                onClick={() => setTADequeueOpen(true)}
+              >
+                Dequeue
+              </Button>
+            </div>
           </Card>
         </div>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="col-span-1" />
-        <Card className="h-fit flex flex-col gap-4">
-          <Text size="h3" className="font-bold">
-            TAs on duty
-          </Text>
-          {tas.map((ta, i) => (
-            <Text
-              key={i}
-              size="p"
-              className="cursor-pointer hover:line-through"
-              onClick={() => setTAToRemove(ta.gtid)}
-            >
-              {ta.name}
-            </Text>
-          ))}
-          <div className="w-full flex justify-center gap-2">
-            <Button
-              className={cn(
-                "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
-                "text-white font-mono",
-              )}
-              onClick={() => setAddTAOpen(true)}
-            >
-              Clock In
-            </Button>
-            <Button
-              className={cn(
-                "border bg-neutral-600/25 hover:bg-neutral-600/50 cursor-pointer transition-all",
-                "text-white font-mono",
-              )}
-              onClick={() => setTADequeueOpen(true)}
-            >
-              Dequeue
-            </Button>
-          </div>
-        </Card>
         <Card className="h-fit flex flex-col gap-4">
           <Text size="h3" className="font-bold">
             Students in the queue
@@ -257,6 +237,9 @@ export const ActiveQueue = ({
             </Button>
           </div>
         </Card>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="col-span-1" />
       </div>
       <GtidPopup
         open={addTAOpen}
