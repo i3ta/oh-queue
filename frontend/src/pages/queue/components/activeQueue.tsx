@@ -224,7 +224,7 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
           <div className="h-[62vh] flex flex-col gap-2 flex-wrap">
             {queue.map((user, i) => (
               <Text key={i} size="p" className="w-40">
-                {user.length <= 10 ? user : `${user.slice(0, 10)}...`}
+                {user.length <= 13 ? user : `${user.slice(0, 10)}...`}
               </Text>
             ))}
           </div>

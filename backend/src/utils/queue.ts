@@ -16,11 +16,41 @@ export const getQueueFromGTID = async (
 };
 
 export const enqueueUser = async (gtid: string, name: string) => {
-  const query = `INSERT INTO queue (gtid, name) VALUES (?, ?)`;
+  const queueQuery = `INSERT INTO queue (gtid, name) VALUES (?, ?)`;
+
   try {
-    const stmt = db.prepare(query);
-    stmt.run(gtid, name);
+    db.exec("BEGIN TRANSACTION");
+
+    // Insert into queue
+    const queueStmt = db.prepare(queueQuery);
+    queueStmt.run(gtid, name);
+
+    // Update or insert student record
+    const studentQuery = `
+      INSERT INTO students (gtid, name, enqueued_times) 
+      VALUES (?, ?, 1)
+      ON CONFLICT(gtid) DO UPDATE SET 
+        name = excluded.name,
+        enqueued_times = enqueued_times + 1
+    `;
+    const studentStmt = db.prepare(studentQuery);
+    studentStmt.run(gtid, name);
+
+    // Update daily queue stats
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
+    const statsQuery = `
+      INSERT INTO queue_stats (date, enqueue_times) 
+      VALUES (?, 1)
+      ON CONFLICT(date) DO UPDATE SET 
+        enqueue_times = enqueue_times + 1
+    `;
+    const statsStmt = db.prepare(statsQuery);
+    statsStmt.run(today);
+
+    db.exec("COMMIT");
   } catch (err: any) {
+    // Rollback on error
+    db.exec("ROLLBACK");
     console.error("Error enqueuing user:", err);
     throw err;
   }
