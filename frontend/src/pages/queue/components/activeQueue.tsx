@@ -223,7 +223,7 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
           </Text>
           {queue.map((user, i) => (
             <Text key={i} size="p">
-              {user}
+              {user.length <= 12 ? user : `${user.slice(0, 11)}...`}
             </Text>
           ))}
           <div className="w-full flex justify-center">
