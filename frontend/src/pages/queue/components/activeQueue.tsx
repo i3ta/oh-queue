@@ -14,6 +14,7 @@ import { addTA, getTAs, removeTA } from "@/lib/api/tas";
 import { cn } from "@/lib/utils";
 import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
+import { NamePopup } from "./namePopup";
 
 export interface ActiveQueueProps {
   estimatedTime: number;
@@ -32,7 +33,10 @@ export const ActiveQueue = ({
   const [addTAOpen, setAddTAOpen] = useState(false);
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [taDequeueOpen, setTADequeueOpen] = useState(false);
+
   const [taToRemove, setTAToRemove] = useState<string | null>(null);
+  const [currentName, setCurrentName] = useState<string | null>(null);
+  const [currentGtid, setCurrentGtid] = useState<string | null>(null);
 
   const expectedTime =
     tas.length > 0 ? (queueLength / tas.length) * estimatedTime : "infinity";
@@ -53,12 +57,23 @@ export const ActiveQueue = ({
   const enqueueStudent = async (gtid: string) => {
     const { type, name } = await enqueueUser(gtid);
     if (type === "exists") {
-      toast(`You are already in the queue! Your name is Anonymous ${name}.`);
+      toast(`You are already in the queue! Your name is ${name}.`);
     } else if (type === "new") {
-      toast(
-        `You have been added to the queue! Your name is Anonymous ${name}.`,
-      );
+      setCurrentName(name);
+      setCurrentGtid(gtid);
     }
+  };
+
+  const handleUpdateName = async (
+    status: "success" | "error",
+    name: string,
+  ) => {
+    if (status === "success") {
+      toast(`You have been added to the queue! Your name is ${name}.`);
+    } else {
+      toast(`There has been an error adding you to the queue...`);
+    }
+    await updateData();
   };
 
   const handleScannedCard = async (gtid: string) => {
@@ -117,7 +132,7 @@ export const ActiveQueue = ({
     if (type === "ta") {
       const name = await dequeueUser();
       if (name) {
-        toast(`The next student is Anonymous ${name}.`);
+        toast(`The next student is ${name}.`);
       } else {
         toast(`The queue is empty.`);
       }
@@ -227,7 +242,7 @@ export const ActiveQueue = ({
           </Text>
           {queue.map((user, i) => (
             <Text key={i} size="p">
-              Anonymous {user}
+              {user}
             </Text>
           ))}
           <div className="w-full flex justify-center">
@@ -262,6 +277,13 @@ export const ActiveQueue = ({
         open={taToRemove !== null}
         setOpen={(val) => !val && setTAToRemove(null)}
         onSubmit={handleRemoveTA}
+      />
+      <NamePopup
+        open={currentName !== null}
+        setOpen={(v) => !v && setCurrentName(null)}
+        gtid={currentGtid}
+        anonName={currentName}
+        onSubmit={handleUpdateName}
       />
     </>
   );

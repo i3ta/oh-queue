@@ -32,6 +32,19 @@ export const enqueueUser = async (gtid: string) => {
   }
 };
 
+export const updateName = async (gtid: string, name: string) => {
+  try {
+    const res = await axios.patch("/api/queue", {
+      gtid: gtid,
+      name: name,
+    });
+    return { type: "success", name: res.data.name };
+  } catch (err: any) {
+    console.error("There was an error updating the user name:", err);
+    return { type: "error", name: null };
+  }
+};
+
 export const dequeueUser = async () => {
   try {
     const res = await axios.delete("/api/queue");

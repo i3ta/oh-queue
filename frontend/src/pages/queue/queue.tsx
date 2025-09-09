@@ -15,7 +15,7 @@ export const Queue = () => {
   const [network, setNetwork] = useState<"pending" | "good" | "bad">("pending");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ohOpen, setOhOpen] = useState(true);
-  const [estimatedTime, setEstimatedTime] = useState(5);
+  const [estimatedTime, setEstimatedTime] = useState(10);
   const [ohEndTime, setOhEndTime] = useState<string>("");
 
   const settings: SettingOption[] = [

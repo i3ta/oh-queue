@@ -1,14 +1,16 @@
 import { Router } from "express";
 import {
-  dequeue as dequeueHandler,
+  dequeueHandler as dequeueHandler,
   enqueueHandler,
-  getQueueData,
+  getDataHandler,
+  updateNameHandler,
 } from "./queue.handlers";
 
 const router = Router();
 
 router.post("/", enqueueHandler);
-router.get("/", getQueueData);
+router.patch("/", updateNameHandler);
+router.get("/", getDataHandler);
 router.delete("/", dequeueHandler);
 
 export default router;

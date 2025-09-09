@@ -5,6 +5,7 @@ import {
   getQueue,
   getQueueFromGTID,
   getQueueLength,
+  updateName,
 } from "@/utils/queue";
 import { getRandomName, getStudent } from "@/utils/userData";
 import { Request, Response } from "express";
@@ -44,7 +45,22 @@ export const enqueueHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const getQueueData = async (_req: Request, res: Response) => {
+export const updateNameHandler = async (req: Request, res: Response) => {
+  try {
+    const gtid = req.body.gtid;
+    const newName = req.body.name;
+
+    await updateName(gtid, newName);
+    res.status(200).json({ gtid: gtid, name: newName });
+    return;
+  } catch (err: any) {
+    console.error("There was an error updating queue name:", err);
+    res.status(500).json({ message: "There was an error updating queue name" });
+    return;
+  }
+};
+
+export const getDataHandler = async (_req: Request, res: Response) => {
   try {
     const length = await getQueueLength();
     const data = await getQueue();
@@ -57,7 +73,7 @@ export const getQueueData = async (_req: Request, res: Response) => {
   }
 };
 
-export const dequeue = async (_req: Request, res: Response) => {
+export const dequeueHandler = async (_req: Request, res: Response) => {
   try {
     const user = await dequeueUser();
     if (user) {

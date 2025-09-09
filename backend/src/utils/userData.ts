@@ -22,5 +22,5 @@ export const getRandomName = async () => {
     newName = names[randomInt(names.length)].Name;
   } while (newName && usedNames.find((e) => e === newName) !== undefined);
 
-  return newName;
+  return `Anonymous ${newName}`;
 };

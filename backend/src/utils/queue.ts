@@ -26,6 +26,17 @@ export const enqueueUser = async (gtid: string, name: string) => {
   }
 };
 
+export const updateName = async (gtid: string, name: string) => {
+  const query = `UPDATE queue SET name = ? WHERE gtid = ?`;
+  try {
+    const stmt = db.prepare(query);
+    stmt.run(name, gtid);
+  } catch (err: any) {
+    console.error("Error updating name in queue:", err);
+    throw err;
+  }
+};
+
 export const getQueueLength = async (): Promise<number> => {
   const query = `SELECT COUNT(*) as count FROM queue`;
   try {
@@ -38,7 +49,7 @@ export const getQueueLength = async (): Promise<number> => {
   }
 };
 
-export const getQueue = async (length: number = 10): Promise<QueueItem[]> => {
+export const getQueue = async (length: number = 3): Promise<QueueItem[]> => {
   const query = `SELECT * FROM queue LIMIT ${length}`;
   try {
     const stmt = db.prepare(query);
