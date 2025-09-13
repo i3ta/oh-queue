@@ -22,20 +22,12 @@ db.exec(`
 `);
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS students (
+  CREATE TABLE IF NOT EXISTS queue_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      gtid TEXT NOT NULL UNIQUE,
-      name TEXT NOT NULL,
-      enqueued_times INTEGER NOT NULL,
-      CHECK (gtid GLOB '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-  );
-`);
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS queue_stats (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      date TEXT NOT NULL UNIQUE,
-      enqueue_times INTEGER NOT NULL
+      gtid TEXT NOT NULL,
+      operation TEXT NOT NULL CHECK (operation IN ('enqueue', 'dequeue')),
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      name TEXT
   );
 `);
 
