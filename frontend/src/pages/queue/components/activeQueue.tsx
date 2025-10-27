@@ -161,6 +161,13 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
               Office hours ends at <span className="font-bold">{endTime}</span>.
             </Text>
           )}
+          <Card className="flex flex-col mt-8 items-center">
+            <img src="/no-ta-qr.png" className="w-10/12 mb-2" />
+            <Text size="p" className="text-center">
+              TA missing from office hours? Scan the QR code below to notify the
+              authorities
+            </Text>
+          </Card>
         </div>
         <div className="col-span-1 flex flex-col gap-4">
           <Card>
