@@ -73,9 +73,10 @@ export const getDataHandler = async (_req: Request, res: Response) => {
   }
 };
 
-export const dequeueHandler = async (_req: Request, res: Response) => {
+export const dequeueHandler = async (req: Request, res: Response) => {
   try {
-    const user = await dequeueUser();
+    const gtid = req.body.gtid;
+    const user = await dequeueUser(gtid);
     if (user) {
       res.status(200).json({ gtid: user.gtid, name: user.name });
     } else {

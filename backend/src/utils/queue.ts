@@ -1,6 +1,7 @@
 import { db } from "@/config/db";
 import { LogEntry } from "@/types/logEntry";
 import { QueueItem } from "@/types/queueItem";
+import { logDequeue, logEnqueue, logUpdateName } from "./log";
 
 export const getQueueFromGTID = async (
   gtid: string,
@@ -27,12 +28,7 @@ export const enqueueUser = async (gtid: string, name: string) => {
     queueStmt.run(gtid, name);
 
     // Log enqueue operation
-    const logQuery = `
-      INSERT INTO queue_log (gtid, name, operation)
-      VALUES (?, ?, 'enqueue')
-    `;
-    const logStmt = db.prepare(logQuery);
-    logStmt.run(gtid, name);
+    logEnqueue(gtid, name);
 
     db.exec("COMMIT");
   } catch (err: any) {
@@ -42,7 +38,7 @@ export const enqueueUser = async (gtid: string, name: string) => {
   }
 };
 
-export const dequeueUser = async (): Promise<QueueItem | null> => {
+export const dequeueUser = async (gtid: string): Promise<QueueItem | null> => {
   const query = `
     DELETE FROM queue
     WHERE id = (
@@ -60,12 +56,7 @@ export const dequeueUser = async (): Promise<QueueItem | null> => {
 
     if (result) {
       // Log dequeue operation
-      const logQuery = `
-        INSERT INTO queue_log (gtid, name, operation)
-        VALUES (?, ?, 'dequeue')
-      `;
-      const logStmt = db.prepare(logQuery);
-      logStmt.run(result.gtid, result.name);
+      logDequeue(gtid, (result as QueueItem).gtid);
     }
 
     db.exec("COMMIT");
@@ -82,6 +73,8 @@ export const updateName = async (gtid: string, name: string) => {
   try {
     const stmt = db.prepare(query);
     stmt.run(name, gtid);
+
+    logUpdateName(gtid, name);
   } catch (err: any) {
     console.error("Error updating name in queue:", err);
     throw err;

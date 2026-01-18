@@ -1,4 +1,5 @@
 import { db } from "@/config/db";
+import { logClock } from "./log";
 
 export const getTas = async (): Promise<Array<{ gtid: string }>> => {
   const query = `SELECT (gtid) FROM tas`;
@@ -27,11 +28,18 @@ export const taOnDuty = async (gtid: string) => {
 export const addTa = async (gtid: string) => {
   const query = `INSERT INTO tas (gtid) VALUES (?)`;
   try {
+    db.exec("BEGIN TRANSACTION");
+
     const stmt = db.prepare(query);
     stmt.run(gtid);
+
+    logClock(gtid, "IN");
     const taGtids = await getTas();
+
+    db.exec("COMMIT");
     return taGtids;
   } catch (err: any) {
+    db.exec("ROLLBACK");
     console.error("Error adding TA:", err);
     throw err;
   }
@@ -40,9 +48,15 @@ export const addTa = async (gtid: string) => {
 export const removeTa = async (gtid: string) => {
   const query = `DELETE FROM tas WHERE gtid = ?`;
   try {
+    db.exec("BEGIN TRANSACTION");
+
     const stmt = db.prepare(query);
     stmt.run(gtid);
+
+    logClock(gtid, "OUT");
+    db.exec("COMMIT");
   } catch (err) {
+    db.exec("ROLLBACK");
     console.error("Error removing TA:", err);
     throw err;
   }

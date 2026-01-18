@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { SettingsPopup } from "./components/settingsPopup";
 import {
+  Book,
+  BookAlert,
   CloudAlert,
   CloudCheck,
   CloudUpload,
   SettingsIcon,
 } from "lucide-react";
 import type { SettingOption } from "@/types/settingOption";
-import { healthcheck } from "@/lib/api/healthcheck";
+import { healthcheck, sheetsHealthcheck } from "@/lib/api/healthcheck";
 import { ActiveQueue } from "./components/activeQueue";
 import { InactiveQueue } from "./components/inactiveQueue";
 
 export const Queue = () => {
   const [network, setNetwork] = useState<"pending" | "good" | "bad">("pending");
+  const [sheets, setSheets] = useState<"pending" | "good" | "bad">("pending");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ohOpen, setOhOpen] = useState(true);
   const [estimatedTime, setEstimatedTime] = useState(10);
@@ -43,10 +46,22 @@ export const Queue = () => {
   ];
 
   useEffect(() => {
-    healthcheck().then((connection) => {
-      if (connection) setNetwork("good");
-      else setNetwork("bad");
-    });
+    const checkStatus = () => {
+      healthcheck().then((connection) => {
+        if (connection) setNetwork("good");
+        else setNetwork("bad");
+      });
+
+      sheetsHealthcheck().then((connection) => {
+        if (connection) setSheets("good");
+        else setSheets("bad");
+      });
+    };
+
+    checkStatus();
+    const intervalId = setInterval(checkStatus, 1000); // check status every 1 second
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -59,6 +74,11 @@ export const Queue = () => {
         ) : (
           <CloudAlert className="text-neutral-600" />
         )}
+        {sheets === "bad" ? (
+          <BookAlert className="text-neutral-600" />
+        ) : (
+          <Book className="text-neutral-600" />
+        )}
         <SettingsIcon
           className="text-neutral-600 cursor-pointer"
           onClick={() => setSettingsOpen(true)}
@@ -66,7 +86,7 @@ export const Queue = () => {
       </div>
       {ohOpen ? (
         <ActiveQueue
-          // estimatedTime={estimatedTime}
+          network={network}
           enabled={!settingsOpen}
           endTime={ohEndTime}
         />

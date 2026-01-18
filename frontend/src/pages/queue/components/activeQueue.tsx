@@ -17,11 +17,16 @@ import { useEffect, useState } from "react";
 import { NamePopup } from "./namePopup";
 
 export interface ActiveQueueProps {
+  network: "pending" | "good" | "bad";
   enabled: boolean;
   endTime: string;
 }
 
-export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
+export const ActiveQueue = ({
+  network,
+  enabled,
+  endTime,
+}: ActiveQueueProps) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [queueLength, setQueueLength] = useState(0);
   const [tas, setTAs] = useState<User[]>([]);
@@ -73,7 +78,7 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
     if (type === "student") {
       await enqueueStudent(gtid);
     } else if (type === "ta") {
-      const name = await dequeueUser();
+      const name = await dequeueUser(gtid);
       if (name) {
         toast(`The next student is ${name}.`);
       } else {
@@ -97,7 +102,6 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
 
   const handleRemoveTA = async (gtid: string) => {
     const type = await getUserType(gtid);
-    console.log(gtid, type, taToRemove);
     if (type === "ta" && taToRemove) {
       await removeTA(taToRemove);
       toast("TA has been clocked out.");
@@ -122,7 +126,7 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
   const handleDequeue = async (gtid: string) => {
     const type = await getUserType(gtid);
     if (type === "ta") {
-      const name = await dequeueUser();
+      const name = await dequeueUser(gtid);
       if (name) {
         toast(`The next student is ${name}.`);
       } else {
@@ -141,8 +145,10 @@ export const ActiveQueue = ({ enabled, endTime }: ActiveQueueProps) => {
 
   useEffect(() => {
     // initialize data
-    updateData();
-  }, []);
+    if (network === "good") {
+      updateData();
+    }
+  }, [network]);
 
   return (
     <>

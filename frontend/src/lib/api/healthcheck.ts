@@ -8,3 +8,12 @@ export const healthcheck = async () => {
     return false;
   }
 };
+
+export const sheetsHealthcheck = async () => {
+  try {
+    await axios.get("/api/health/sheets");
+    return true;
+  } catch (err: any) {
+    return false;
+  }
+};

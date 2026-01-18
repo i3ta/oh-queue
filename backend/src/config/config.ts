@@ -7,6 +7,8 @@ interface Config {
   studentDataFile: string;
   taDataFile: string;
   nameDataFile: string;
+  spreadsheetId: string;
+  googleKeyPath: string;
 }
 
 export const config: Config = {
@@ -15,4 +17,6 @@ export const config: Config = {
   studentDataFile: process.env.STUDENT_DATA ?? "data/student.csv",
   taDataFile: process.env.TA_DATA ?? "data/ta.csv",
   nameDataFile: process.env.NAME_DATA ?? "data/foods.csv",
+  spreadsheetId: process.env.SPREADSHEET_ID ?? "",
+  googleKeyPath: process.env.GOOGLE_KEY_PATH ?? "keys/",
 };
