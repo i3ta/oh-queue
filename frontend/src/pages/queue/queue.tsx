@@ -59,7 +59,7 @@ export const Queue = () => {
     };
 
     checkStatus();
-    const intervalId = setInterval(checkStatus, 1000); // check status every 1 second
+    const intervalId = setInterval(checkStatus, 60000); // check status every 1 minute
 
     return () => clearInterval(intervalId);
   }, []);
